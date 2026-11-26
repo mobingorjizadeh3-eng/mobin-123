@@ -2,66 +2,39 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device0.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Ragdoll Combat 3D | Mobin Gorjizade</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script id="three-primary-cdn" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-    (function () {
-      if (!window.THREE) {
-        var fb = document.createElement('script');
-        fb.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';
-        fb.async = false;
-        document.head.appendChild(fb);
-      }
-    })();
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Ragdoll Combat 3D | Loading...</title>
   <style>
-    * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; font-family: system-ui, -apple-system, 'Segoe UI', Tahoma, sans-serif; }
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; touch-action: none; background-color: #0b0f17; color: #f8fafc; }
-    #game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; touch-action: none; }
-    .glass-panel { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.14); box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55); }
-    .weapon-card { transition: transform 0.14s ease, background-color 0.14s ease, border-color 0.14s ease; touch-action: manipulation; }
-    .weapon-card.active { background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(153, 27, 27, 0.96)); border-color: #fca5a5; box-shadow: 0 0 18px rgba(239, 68, 68, 0.55); transform: translateY(-2px) scale(1.04); }
-    .tactile-btn { transition: transform 0.1s ease, filter 0.12s ease; touch-action: manipulation; }
-    .tactile-btn:active { transform: scale(0.92); filter: brightness(1.15); }
-    #fire-btn { background: radial-gradient(circle at 32% 28%, #ef4444, #991b1b); border: 3px solid rgba(254, 202, 202, 0.75); box-shadow: 0 10px 28px rgba(220, 38, 38, 0.6), inset 0 3px 10px rgba(255, 255, 255, 0.35); touch-action: none; }
-    #fire-btn.firing { transform: scale(0.89); background: radial-gradient(circle at 32% 28%, #f97316, #b91c1c); box-shadow: 0 4px 16px rgba(249, 115, 22, 0.85), inset 0 2px 12px rgba(255, 255, 255, 0.55); }
-    #joystick-zone { touch-action: none; }
-    #joystick-base { background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, rgba(15,23,42,0.72) 100%); border: 2px solid rgba(255, 255, 255, 0.24); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55); }
-    #joystick-knob { background: radial-gradient(circle at 35% 35%, #ffffff, #94a3b8); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.65); }
-    @keyframes hitFlash { 0% { transform: translate(-50%, -50%) scale(1.6) rotate(45deg); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0.95) rotate(45deg); opacity: 0; } }
-    .hit-anim { animation: hitFlash 0.24s ease-out forwards; }
-    @keyframes popupFloat { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.85); } 25% { opacity: 1; transform: translate(-50%, -95%) scale(1.1); } 100% { opacity: 0; transform: translate(-50%, -185%) scale(0.95); } }
-    .status-popup { position: absolute; pointer-events: none; font-weight: 900; text-shadow: 0 2px 6px rgba(0,0,0,0.95); animation: popupFloat 0.9s ease-out forwards; white-space: nowrap; z-index: 25; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes loadSpin { to { transform: rotate(360deg); } }
-    .spin-anim { animation: loadSpin 1s linear infinite; }
+    html, body { margin:0; padding:0; width:100%; height:100%; background:#0b0f17; color:#f8fafc; font-family: system-ui, sans-serif; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+    .spinner { width:48px; height:48px; border:4px solid #1e293b; border-top-color:#ef4444; border-radius:50%; animation:spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    p { font-size:14px; opacity:0.8; }
   </style>
 </head>
 <body>
-  <canvas id="game-canvas"></canvas>
-  <div id="loading-screen" class="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-slate-950" style="transition: opacity 0.6s ease;">
-    <div class="relative flex flex-col items-center gap-4">
-      <div class="relative w-28 h-28">
-        <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-        <div class="absolute inset-0 rounded-full border-4 border-transparent border-t-red-500 border-r-rose-400 spin-anim"></div>
-        <div class="absolute inset-3 rounded-full bg-slate-900 flex items-center justify-center"><span class="text-3xl">⚔️</span></div>
-      </div>
-      <h2 class="text-lg font-black text-white tracking-widest">RAGDOLL COMBAT 3D</h2>
-      <p id="load-status" class="text-xs text-slate-400 font-mono">در حال بازگردانی بازی...</p>
-      <div class="w-64 h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="load-bar" class="h-full w-0 bg-gradient-to-l from-red-500 to-rose-400 transition-all duration-200"></div></div>
-    </div>
-    <div class="absolute bottom-8 text-center">
-      <p class="text-lg font-black bg-gradient-to-l from-red-400 via-rose-300 to-amber-300 bg-clip-text text-transparent tracking-wider">MOBIN GORJIZADE</p>
-    </div>
-  </div>
+  <div class="spinner"></div>
+  <p id="status">در حال بارگذاری نسخه کامل بازی...</p>
   <script>
-    // Temporary restore page - full game will be restored shortly
-    setTimeout(() => {
-      document.getElementById('load-status').textContent = 'لطفا صفحه را رفرش کنید یا به گراک بگویید نسخه کامل را push کند';
-    }, 2000);
+    (async function() {
+      const status = document.getElementById('status');
+      try {
+        // Load the last known good full version from git history
+        const url = 'https://raw.githubusercontent.com/mobingorjizadeh3-eng/mobin-123/8c7721680d926e19f0b8f3eb630583d9cfdfb652/index.html';
+        status.textContent = 'در حال دریافت کد کامل...';
+        const res = await fetch(url + '?t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const html = await res.text();
+        if (html.length < 50000) throw new Error('فایل ناقص دریافت شد');
+        status.textContent = 'در حال راه‌اندازی بازی...';
+        // Replace entire document with the full game
+        document.open();
+        document.write(html);
+        document.close();
+      } catch (err) {
+        status.innerHTML = 'خطا در بارگذاری: ' + err.message + '<br><br>لطفاً به گراک بگو «نسخه اصلی رو از تاریخچه برگردون»';
+        console.error(err);
+      }
+    })();
   </script>
 </body>
 </html>
